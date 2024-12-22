@@ -1,0 +1,26 @@
+Simulated Annealing (SA) is a nature-inspired optimization algorithm based on the physical process of annealing in metallurgy, where metals are heated and slowly cooled to form stable structures with minimal energy. Here's how the key steps of SA work:
+1. Initialization
+•	Idea: Start with an initial solution and a high "temperature."
+•	The initial solution is generated randomly or based on a heuristic.
+•	The temperature parameter controls the likelihood of accepting worse solutions initially, helping to explore the solution space widely.
+2. Neighbor Solution Generation
+•	Idea: Generate a neighboring solution by making a small, random change to the current solution.
+•	This step explores the local solution space.
+3. Energy (Objective Function) Evaluation
+•	Idea: Compute the "energy" (objective function value) of the current solution and the neighboring solution.
+•	The goal is to minimize (or maximize) this energy, depending on the problem.
+4. Acceptance of the Neighbor Solution
+•	Idea: Decide whether to accept the neighboring solution:
+o	If the neighbor has a lower energy (better solution), accept it.
+o	If the neighbor has a higher energy (worse solution), accept it with a probability based on the Metropolis criterion: P=e−ΔE/TP = e^{-\Delta E / T}P=e−ΔE/T
+	ΔE\Delta EΔE: Difference in energy between the current and neighbor solution.
+	TTT: Current temperature.
+	Explanation: This probabilistic acceptance helps escape local optima by occasionally accepting worse solutions early in the process.
+5. Cooling Schedule
+•	Idea: Gradually reduce the temperature as the algorithm progresses (Cooling factor, typically lies between 0.8 and 0.99).
+•	As the temperature decreases, the likelihood of accepting worse solutions diminishes, leading the algorithm to converge on the best solution found.
+6. Termination
+•	Idea: Stop the algorithm when a stopping criterion is met:
+o	Temperature reaches a minimum value.
+o	Maximum number of iterations is completed.
+o	No significant improvement is observed over several iterations.
