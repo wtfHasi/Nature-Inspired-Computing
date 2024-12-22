@@ -1,0 +1,61 @@
+import math
+import random
+# Define the objective function
+# This is the function we aim to minimize: f(x) = x^2
+def objective_function(x):
+    return x ** 2
+# Simulated Annealing Algorithm
+def simulated_annealing(objective, bounds, initial_temp, cooling_rate, max_iterations):
+    # Step 1: Initialize the algorithm
+    # Generate a random initial solution within the specified bounds
+    current_solution = random.uniform(bounds[0], bounds[1])
+    # Calculate the energy (objective value) of the initial solution
+    current_energy = objective(current_solution)
+    # Set the initial temperature
+    temperature = initial_temp
+    # Initialize variables to keep track of the best solution found
+    best_solution = current_solution
+    best_energy = current_energy
+    # Main optimization loop
+    for iteration in range(max_iterations):
+        # Step 2: Generate a neighbor solution
+        # Create a new candidate solution by slightly perturbing the current solution
+        neighbor = current_solution + random.uniform(-1, 1)  # Random step in range [-1, 1]
+        # Ensure the neighbor stays within the allowed bounds
+        neighbor = max(min(neighbor, bounds[1]), bounds[0])
+        # Calculate the energy (objective value) of the neighbor solution
+        neighbor_energy = objective(neighbor)
+        # Step 3: Decide whether to accept the neighbor solution
+        if neighbor_energy < current_energy:
+            # If the neighbor is better (lower energy), accept it
+            current_solution, current_energy = neighbor, neighbor_energy
+        else:
+            # If the neighbor is worse, accept it with a probability determined by the Metropolis criterion
+            delta = neighbor_energy - current_energy  # Difference in energy
+            acceptance_probability = math.exp(-delta / temperature) 
+ # Probability of acceptance
+            if random.random() < acceptance_probability:
+                # Accept the worse solution based on the acceptance probability
+                current_solution, current_energy = neighbor, neighbor_energy
+        # Step 4: Update the best solution found so far
+        if current_energy < best_energy:
+            best_solution, best_energy = current_solution, current_energy
+        
+        # Step 5: Cool down the temperature
+        temperature *= cooling_rate  # Gradually reduce the temperature
+        # Print the progress every 100 iterations (or at the last iteration)
+        if iteration % 100 == 0 or iteration == max_iterations - 1:
+            print(f"Iteration {iteration}: Best Solution = {best_solution:.4f}, Energy = {best_energy:.4f}")
+    # Return the best solution and its energy (objective value)
+    return best_solution, best_energy
+# Parameters for the Simulated Annealing algorithm
+bounds = (-10, 10)            # Range of x (search space)
+initial_temp = 1000           # Initial temperature (controls initial randomness)
+cooling_rate = 0.95           # Cooling rate (determines how fast the temperature decreases)
+max_iterations = 1000         # Maximum number of iterations to perform
+# Run the Simulated Annealing algorithm
+best_solution, best_energy = simulated_annealing(
+    objective_function, bounds, initial_temp, cooling_rate, max_iterations
+)
+# Print the final result
+print(f"\nOptimal Solution: x = {best_solution:.4f}, f(x) = {best_energy:.4f}")
