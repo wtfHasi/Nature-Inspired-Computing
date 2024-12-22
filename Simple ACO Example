@@ -1,0 +1,115 @@
+import random
+import math
+import numpy as np
+
+# Problem setup: a simple TSP problem with 5 cities (0 to 4)
+cities = [(0, 0), (1, 3), (3, 1), (5, 2), (6, 5)]
+n_cities = len(cities)
+
+# Parameters for ACO
+n_ants = 5
+n_iterations = 100
+alpha = 1  # influence of pheromone
+beta = 2   # influence of distance (heuristic)
+rho = 0.1  # pheromone evaporation rate
+Q = 100     # pheromone deposit constant
+
+# Calculate the Euclidean distance between two cities
+def euclidean_distance(city1, city2):
+    return math.sqrt((city1[0] - city2[0])**2 + (city1[1] - city2[1])**2)
+
+# Initialize pheromone matrix and heuristic matrix
+pheromone = np.ones((n_cities, n_cities))  # initial pheromone levels
+distances = np.zeros((n_cities, n_cities))
+
+for i in range(n_cities):
+    for j in range(n_cities):
+        if i != j:
+            distances[i][j] = euclidean_distance(cities[i], cities[j])
+
+# Ant Colony Optimization Function
+def aco():
+    best_path = None
+    best_distance = float('inf')
+
+    for iteration in range(n_iterations):
+        paths = []
+        path_lengths = []
+
+        # Step 1: All ants build a solution
+        for ant in range(n_ants):
+            path = build_path()
+            path_length = compute_path_length(path)
+            paths.append(path)
+            path_lengths.append(path_length)
+
+            # Step 2: Update the global best solution
+            if path_length < best_distance:
+                best_path = path
+                best_distance = path_length
+
+        # Step 3: Update pheromone matrix
+        update_pheromone(paths, path_lengths)
+
+    return best_path, best_distance
+
+# Step 1: Ant builds a path by choosing the next city based on pheromone and distance
+def build_path():
+    visited = [False] * n_cities
+    path = []
+    current_city = random.randint(0, n_cities - 1)
+    visited[current_city] = True
+    path.append(current_city)
+
+    for _ in range(n_cities - 1):
+        next_city = choose_next_city(current_city, visited)
+        visited[next_city] = True
+        path.append(next_city)
+        current_city = next_city
+
+    return path
+
+# Step 2: Calculate the length of a path
+def compute_path_length(path):
+    length = 0
+    for i in range(len(path) - 1):
+        length += distances[path[i]][path[i + 1]]
+    length += distances[path[-1]][path[0]]  # returning to the start city
+    return length
+
+# Step 3: Choose the next city based on pheromone and distance (heuristic)
+def choose_next_city(current_city, visited):
+    probabilities = []
+    total = 0
+
+    for next_city in range(n_cities):
+        if not visited[next_city]:
+            pheromone_level = pheromone[current_city][next_city] ** alpha
+            heuristic = (1.0 / distances[current_city][next_city]) ** beta
+            prob = pheromone_level * heuristic
+            probabilities.append(prob)
+            total += prob
+        else:
+            probabilities.append(0)
+
+    # Normalize the probabilities
+    probabilities = [p / total for p in probabilities]
+
+    # Choose the next city based on probability distribution
+    return random.choices(range(n_cities), probabilities)[0]
+
+# Step 4: Update the pheromone levels based on the paths and their lengths
+def update_pheromone(paths, path_lengths):
+    global pheromone
+    pheromone *= (1 - rho)  # evaporation
+    for i, path in enumerate(paths):
+        pheromone_deposit = Q / path_lengths[i]
+        for j in range(len(path) - 1):
+            pheromone[path[j]][path[j + 1]] += pheromone_deposit
+        pheromone[path[-1]][path[0]] += pheromone_deposit  # returning to start city
+
+# Run the ACO algorithm
+best_path, best_distance = aco()
+
+print("Best path found:", best_path)
+print("Best path length:", best_distance)
