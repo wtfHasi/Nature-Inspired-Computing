@@ -1,0 +1,21 @@
+ACO is inspired by how ants find the shortest path to a food source. It’s used to solve complex problems like finding the best routes or schedules.
+1.	Initialization
+o	Define the problem as a network of nodes.
+o	Set up pheromone levels on all paths (edges) and define algorithm parameters like the number of ants and pheromone evaporation rate.
+2.	Solution Construction
+o	Each ant starts from a random point and builds a solution step by step.
+o	The ant decides which path to take next based on two factors:
+	Pheromone levels: Paths with more pheromones are more attractive.
+	Heuristic information: Some paths are naturally better.
+3.	Evaluate Solutions
+o	Once all ants have completed their routes, evaluate how good their solutions are .
+o	Keep track of the best solution found so far.
+4.	Pheromone Update
+o	Evaporation: Reduce pheromone levels on all paths to avoid overemphasizing older solutions.
+o	Reinforcement: Add pheromones to the paths used by ants, giving more pheromones to better solutions so future ants are more likely to follow them.
+5.	Exploration vs. Exploitation
+o	Ants sometimes explore less popular paths to discover new solutions, instead of always following the ones with the most pheromones.
+o	This balance ensures the algorithm doesn’t get stuck on suboptimal solutions.
+6.	Repeat Until Done
+o	The process of building solutions, evaluating them, and updating pheromones is repeated until a stopping condition is met (e.g., a certain number of iterations or no improvement in the best solution).
+
