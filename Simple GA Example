@@ -1,0 +1,91 @@
+import random
+
+# Define the fitness function: f(x) = x^2
+# The goal is to maximize this function.
+def fitness_function(x):
+    return x ** 2
+
+# Convert a binary string (list of 0s and 1s) to an integer value
+def binary_to_int(binary):
+    return int("".join(map(str, binary)), 2)
+
+# Generate the initial population
+# Each individual is represented as a binary string of fixed length
+def initialize_population(pop_size, chromosome_length):
+    return [[random.randint(0, 1) for _ in range(chromosome_length)] for _ in range(pop_size)]
+
+# Evaluate the fitness of each individual in the population
+# Fitness is determined by the fitness function
+def evaluate_fitness(population):
+    return [fitness_function(binary_to_int(individual)) for individual in population]
+
+# Select parents for the next generation using tournament selection
+def select_parents(population, fitness):
+    parents = []
+    for _ in range(len(population)):
+        # Randomly pick two individuals and choose the one with higher fitness
+        i1, i2 = random.sample(range(len(population)), 2)
+        parents.append(population[i1] if fitness[i1] > fitness[i2] else population[i2])
+    return parents
+
+# Perform single-point crossover to create offspring
+def crossover(parent1, parent2):
+    # Choose a random point for crossover
+    point = random.randint(1, len(parent1) - 1)
+    # Create two offspring by swapping genes after the crossover point
+    return parent1[:point] + parent2[point:], parent2[:point] + parent1[point:]
+
+# Perform mutation on an individual
+# Randomly flip bits based on the mutation rate
+def mutate(individual, mutation_rate):
+    return [1 - gene if random.random() < mutation_rate else gene for gene in individual]
+
+# Main Genetic Algorithm function
+def genetic_algorithm(pop_size, chromosome_length, generations, mutation_rate):
+    # Step 1: Initialize the population
+    population = initialize_population(pop_size, chromosome_length)
+    
+    for generation in range(generations):
+        # Step 2: Evaluate fitness of the population
+        fitness = evaluate_fitness(population)
+        
+        # Step 3: Select parents for reproduction
+        parents = select_parents(population, fitness)
+        
+        # Step 4: Create the next generation through crossover and mutation
+        next_generation = []
+        for i in range(0, len(parents), 2):
+            # Pair parents (with wrap-around if the number of parents is odd)
+            parent1, parent2 = parents[i], parents[(i+1) % len(parents)]
+            # Perform crossover to create two offspring
+            offspring1, offspring2 = crossover(parent1, parent2)
+            # Apply mutation to offspring
+            next_generation.extend([mutate(offspring1, mutation_rate), mutate(offspring2, mutation_rate)])
+        
+        # Replace the old population with the new one
+        population = next_generation
+        
+        # Print the best solution of the current generation
+        best_fitness = max(fitness)
+        best_individual = population[fitness.index(best_fitness)]
+        print(f"Generation {generation + 1}: Best = {binary_to_int(best_individual)}, Fitness = {best_fitness}")
+    
+    # Return the best solution from the final population
+    best_fitness = max(fitness)
+    best_individual = population[fitness.index(best_fitness)]
+    return binary_to_int(best_individual), best_fitness
+
+# Run the Genetic Algorithm with the following parameters:
+# - Population size: 10
+# - Chromosome length: 5 bits
+# - Number of generations: 20
+# - Mutation rate: 10%
+best_solution, best_fitness = genetic_algorithm(
+    pop_size=10,          # Number of individuals in the population
+    chromosome_length=5,  # Length of each binary chromosome
+    generations=20,       # Number of generations to evolve
+    mutation_rate=0.1     # Probability of mutation per gene
+)
+
+# Print the final best solution and its fitness
+print(f"\nBest solution: x = {best_solution}, f(x) = {best_fitness}")
