@@ -1,0 +1,26 @@
+A Genetic Algorithm (GA) is a population-based optimization technique inspired by Darwin’s theory of evolution, focusing on survival of the fittest.
+________________________________________
+1. Initialization
+A population of candidate solutions (called chromosomes) is randomly generated.
+Each chromosome represents a potential solution and is encoded as a sequence of genes (typically binary strings, integers, or real numbers).
+2. Fitness Evaluation
+Each chromosome is evaluated using a predefined objective function, which quantifies how "fit" or "good" the solution is for the given problem.
+3. Selection
+Chromosomes with higher fitness are more likely to be selected for reproduction. This simulates the "survival of the fittest."
+Common selection techniques include:
+o	Roulette Wheel Selection: Probability of selection proportional to fitness.
+o	Tournament Selection: Randomly selecting a subset of chromosomes and choosing the best one.
+4. Crossover
+Two parent chromosomes are combined to produce offspring by exchanging parts of their genetic information. This introduces diversity into the population.
+o	Single-point crossover: Swap genes after a random point.
+o	Multi-point crossover: Swap genes at multiple points.
+o	Uniform crossover: Randomly decide which parent's gene to inherit for each position.
+5. Mutation
+Small random changes are introduced in the offspring's genes to maintain genetic diversity and avoid premature convergence to suboptimal solutions.
+6. Replacement
+The offspring replace the less fit members of the current population to form the next generation. This ensures continuous improvement.
+7. Termination
+The algorithm stops when a predefined condition is met, such as:
+o	A maximum number of generations.
+o	A solution with acceptable fitness is found.
+o	No significant improvement in fitness over several iterations.
