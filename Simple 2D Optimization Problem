@@ -1,0 +1,82 @@
+import random
+
+# Define the objective function: f(x, y) = x^2 + y^2
+def objective_function(position):
+    x, y = position
+    return x**2 + y**2
+
+# Particle class to represent each solution in the swarm
+class Particle:
+    def __init__(self, bounds):
+        # Initialize position and velocity randomly within bounds
+        self.position = [random.uniform(bounds[0], bounds[1]) for _ in range(2)]  # 2D space (x, y)
+        self.velocity = [random.uniform(-1, 1) for _ in range(2)]
+        # Initialize personal best position and fitness
+        self.best_position = self.position[:]
+        self.best_fitness = objective_function(self.position)
+        # Current fitness
+        self.fitness = self.best_fitness
+
+    def update_fitness(self):
+        # Update the particle's fitness based on its position
+        self.fitness = objective_function(self.position)
+        # Update personal best if current position is better
+        if self.fitness < self.best_fitness:
+            self.best_position = self.position[:]
+            self.best_fitness = self.fitness
+
+# Particle Swarm Optimization function
+def particle_swarm_optimization(objective, bounds, num_particles, max_iterations, w, c1, c2):
+    # Step 1: Initialize the swarm
+    swarm = [Particle(bounds) for _ in range(num_particles)]
+    # Track the global best position and fitness
+    global_best_position = min(swarm, key=lambda p: p.best_fitness).best_position[:]
+    global_best_fitness = objective(global_best_position)
+
+    # Main optimization loop
+    for iteration in range(max_iterations):
+        for particle in swarm:
+            # Step 2: Update particle velocity
+            for i in range(2):  # For each dimension (x and y)
+                inertia = w * particle.velocity[i]
+                cognitive = c1 * random.random() * (particle.best_position[i] - particle.position[i])
+                social = c2 * random.random() * (global_best_position[i] - particle.position[i])
+                particle.velocity[i] = inertia + cognitive + social
+
+            # Step 3: Update particle position
+            for i in range(2):
+                particle.position[i] += particle.velocity[i]
+                # Ensure the particle stays within bounds
+                particle.position[i] = max(min(particle.position[i], bounds[1]), bounds[0])
+
+            # Step 4: Update particle fitness
+            particle.update_fitness()
+
+        # Step 5: Update global best
+        for particle in swarm:
+            if particle.best_fitness < global_best_fitness:
+                global_best_position = particle.best_position[:]
+                global_best_fitness = particle.best_fitness
+
+        # Print progress every few iterations
+        if iteration % 10 == 0 or iteration == max_iterations - 1:
+            print(f"Iteration {iteration}: Global Best Position = {global_best_position}, Fitness = {global_best_fitness:.4f}")
+
+    # Return the best solution found
+    return global_best_position, global_best_fitness
+
+# Parameters for PSO
+bounds = (-10, 10)  # Search space bounds for x and y
+num_particles = 20  # Number of particles in the swarm
+max_iterations = 50  # Maximum number of iterations
+w = 0.7  # Inertia weight
+c1 = 1.5  # Cognitive (personal influence) weight
+c2 = 1.5  # Social (global influence) weight
+
+# Run PSO
+best_position, best_fitness = particle_swarm_optimization(
+    objective_function, bounds, num_particles, max_iterations, w, c1, c2
+)
+
+# Print the final result
+print(f"\nOptimal Solution: Position = {best_position}, Fitness = {best_fitness:.4f}")
